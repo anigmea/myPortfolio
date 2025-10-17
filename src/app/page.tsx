@@ -19,9 +19,9 @@ function Typewriter({ text, speed = 50, delay = 0, onComplete, className, wrappe
     if (!text) return;
     setDisplayedText('');
     setIsDone(false);
-    const charIndex = 0;
-    const timeoutId;
-    const delayId;
+    let charIndex = 0;
+    let timeoutId;
+    let delayId;
 
     const startTyping = () => {
       if (charIndex < text.length) {
@@ -467,7 +467,7 @@ const ContactForm = () => {
   // State to hold the message from the textarea
   const [message, setMessage] = useState('');
 
-  const handleSendMessage = (_e) => {
+  const handleSendMessage = (e) => {
       // Prevents the browser from reloading the page
       e.preventDefault();
 
