@@ -21,7 +21,7 @@ function Typewriter({ text, speed = 50, delay = 0, onComplete, className, wrappe
     setIsDone(false);
     let charIndex = 0;
     let timeoutId;
-    let delayId;
+    const delayId;
 
     const startTyping = () => {
       if (charIndex < text.length) {
