@@ -41,8 +41,8 @@ CONVERSATION FLOW:
 4. If conversational, respond naturally.
 5. If unclear, ask for clarification.`;
 
-    // Initialize the model (using stable version with better quotas)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Format history for Gemini
     const chat = model.startChat({
