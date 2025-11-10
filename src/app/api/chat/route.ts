@@ -1,14 +1,12 @@
 import { NextRequest } from 'next/server';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize OpenAI with Emergent Universal Key
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY environment variable is not set.");
+// Initialize Gemini
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY environment variable is not set.");
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
