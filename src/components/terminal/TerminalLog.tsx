@@ -64,16 +64,21 @@ export const TerminalLog = memo(function TerminalLog({
           return (
             <div
               key={`entry-${index}`}
-              className={`font-mono tracking-widest mb-2 ${lightMode ? '' : 'drop-shadow-[0_0_10px_#00ffaa]'}`}
+              className={`font-mono mb-3 p-3 rounded-lg ${
+                entry.type === 'user' 
+                  ? lightMode ? 'bg-blue-50 border-l-4 border-blue-400' : 'bg-green-900/20 border-l-4 border-green-500'
+                  : lightMode ? 'bg-gray-50' : 'bg-black/40'
+              }`}
               style={{ 
                 whiteSpace: "pre-line", 
                 display: "block", 
-                lineHeight: "1.5", 
-                fontSize: "1rem",
+                lineHeight: "1.6", 
+                fontSize: "0.9rem",
                 color: lightMode ? '#2563eb' : '#6ee7b7'
               }}
             >
-              {entry.type === 'user' && <span className="text-green-400">$ </span>}
+              {entry.type === 'user' && <span className={`font-bold ${lightMode ? 'text-blue-600' : 'text-green-400'}`}>You: </span>}
+              {entry.type === 'ai' && <span className={`font-bold ${lightMode ? 'text-purple-600' : 'text-cyan-400'}`}>DK-01: </span>}
               {entry.text || ''}
             </div>
           );
