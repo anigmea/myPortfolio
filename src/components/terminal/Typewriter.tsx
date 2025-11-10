@@ -54,7 +54,7 @@ export function Typewriter({
     };
   }, [text, speed, delay]);
 
-  const Wrapper = wrapper as any;
+  const Wrapper = wrapper as keyof JSX.IntrinsicElements;
   return (
     <Wrapper className={className} style={style}>
       {displayedText}
