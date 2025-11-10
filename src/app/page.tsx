@@ -1291,14 +1291,15 @@ const NeuralBlob = memo(function NeuralBlob({ status }: any) {
   }, []);
 
   return (
-    <div className="w-full md:w-1/2 flex items-center justify-center p-4" onMouseMove={handleMouseMove}>
+    <div className="w-full flex items-center justify-center p-4 md:p-8" onMouseMove={handleMouseMove} style={{ minHeight: '500px' }}>
       <motion.div
-        className="relative w-[30rem] h-[30rem] flex items-center justify-center transition-all duration-500 ease-out"
+        className="relative flex items-center justify-center transition-all duration-500 ease-out"
+        style={{ width: '480px', height: '480px', maxWidth: '90vw', maxHeight: '90vw' }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: theme.scale, rotate: rotationZ }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
       >
-        <svg className="absolute inset-0 w-full h-full">
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 480 480" preserveAspectRatio="xMidYMid meet">
           {connections.map((connection, i) => {
             const fromX = connection.from.x;
             const fromY = connection.from.y;
