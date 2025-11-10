@@ -152,7 +152,11 @@ export const NeuralBlob = memo(function NeuralBlob({ status }: NeuralBlobProps) 
           rotate: { type: "tween", duration: 0, ease: "linear" }
         }}
       >
-        <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+        <svg 
+          className="absolute inset-0 w-full h-full" 
+          viewBox="0 0 480 480"
+          style={{ overflow: 'visible' }}
+        >
           {connections.map((connection, i) => {
             const fromX = connection.from.x;
             const fromY = connection.from.y;
