@@ -26,14 +26,14 @@ export const TerminalLog = memo(function TerminalLog({
   }, [log]);
 
   return (
-    <div className="flex flex-col items-start justify-start w-full md:w-1/2 max-w-lg text-left select-none p-4 md:p-0">
+    <div className="flex flex-col items-start justify-start w-full text-left select-none">
       <div 
         ref={logRef}
-        className={`w-full max-h-96 overflow-y-auto scrollbar-thin ${lightMode ? 'scrollbar-thumb-blue-500/30' : 'scrollbar-thumb-green-500/30'} scrollbar-track-transparent`}
+        className={`w-full overflow-y-auto scrollbar-thin ${lightMode ? 'scrollbar-thumb-blue-500/30' : 'scrollbar-thumb-green-500/30'} scrollbar-track-transparent`}
         style={{ 
           fontFamily: 'monospace',
-          fontSize: '1rem',
-          lineHeight: '1.5',
+          fontSize: '0.9rem',
+          lineHeight: '1.6',
           color: lightMode ? '#2563eb' : '#6ee7b7'
         }}
       >
