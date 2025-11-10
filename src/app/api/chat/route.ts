@@ -41,33 +41,29 @@ CONVERSATION FLOW:
 4. If conversational, respond naturally.
 5. If unclear, ask for clarification.`;
 
-    // Format history for OpenAI
-    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-      { role: 'system', content: systemPrompt },
-      ...history.map((turn: { role: string; content: string }) => ({
-        role: turn.role === 'ai' ? 'assistant' as const : 'user' as const,
-        content: turn.content
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    // Format history for Gemini
+    const chat = model.startChat({
+      history: history.map((turn: { role: string; content: string }) => ({
+        role: turn.role === 'ai' ? 'model' : 'user',
+        parts: [{ text: turn.content }]
       })),
-      { role: 'user', content: prompt }
-    ];
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+    });
 
     // Stream the response
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 500,
-    });
+    const result = await chat.sendMessageStream(prompt);
 
     // Create a readable stream for the browser
     const encoder = new TextEncoder();
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of stream) {
-            const text = chunk.choices[0]?.delta?.content || '';
-            if (text) {
+          for await (const chunk of result.stream) {
+            const text = chunk.text();
+            if (text && text.trim().length > 0) {
               controller.enqueue(encoder.encode(text));
             }
           }
