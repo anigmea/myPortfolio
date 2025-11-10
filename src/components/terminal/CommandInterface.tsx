@@ -63,23 +63,33 @@ export function CommandInterface({
   };
 
   return (
-    <div className="w-full max-w-lg mt-4">
-      <form onSubmit={handleSubmit} className="flex items-center">
-        <span className={`text-2xl lg:text-3xl font-mono tracking-widest mr-2 ${lightMode ? 'text-blue-600' : 'text-green-300'}`}>
-          {'>'}
-        </span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className={`flex-grow bg-transparent border-none text-2xl lg:text-3xl font-mono tracking-widest focus:outline-none ${lightMode ? 'text-blue-600 placeholder-blue-400/50' : 'text-green-300 placeholder-green-500/50'}`}
-          placeholder={isThinking ? "Thinking..." : (disabled ? "Processing..." : "Ask me anything...")}
-          disabled={disabled || isThinking}
-          autoFocus
-        />
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="flex items-center gap-3 w-full">
+      <input
+        ref={inputRef}
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        className={`flex-grow px-4 py-3 text-lg rounded-xl bg-transparent border-none focus:outline-none ${
+          lightMode 
+            ? 'text-blue-900 placeholder-blue-400' 
+            : 'text-green-300 placeholder-green-500/60'
+        }`}
+        placeholder={isThinking ? "🤔 Thinking..." : (disabled ? "Processing..." : "Ask me anything...")}
+        disabled={disabled || isThinking}
+        autoFocus
+      />
+      <button
+        type="submit"
+        disabled={disabled || isThinking || !input.trim()}
+        className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+          lightMode
+            ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300'
+            : 'bg-green-600 text-black hover:bg-green-500 disabled:bg-green-900 disabled:text-green-700'
+        } disabled:cursor-not-allowed`}
+      >
+        {isThinking ? '...' : '→'}
+      </button>
+    </form>
   );
 }
