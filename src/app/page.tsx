@@ -1434,6 +1434,7 @@ const ContactForm = () => {
 export default function Home() {
   const [booted, setBooted] = useState(false);
   const [log, setLog] = useState([{ type: 'system', text: "Welcome, Visitor.\nDK-01 Cognitive Interface active.\n\n> [ Awaiting command... ]" }]);
+  const [forceShowInput, setForceShowInput] = useState(false);
   const [activeContent, setActiveContent] = useState<any>(null);
   const [aiStatus, setAiStatus] = useState('idle');
   const [isTyping, setIsTyping] = useState(true);
