@@ -43,7 +43,7 @@ export interface Education {
 export interface ContentDisplayProps {
   type: string;
   title?: string;
-  payload?: any;
+  payload?: unknown;
 }
 
 export type AIStatus = 'idle' | 'thinking' | 'processing' | 'projects' | 'intelligence' | 'future' | 'contact' | 'experience' | 'education' | 'system_status';
