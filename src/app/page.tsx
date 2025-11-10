@@ -1472,6 +1472,12 @@ export default function Home() {
     if (booted) {
       // Log is already set in the previous useEffect
       setIsTyping(true);
+      // Force show input after 5 seconds as fallback
+      const fallbackTimer = setTimeout(() => {
+        setIsTyping(false);
+        setForceShowInput(true);
+      }, 5000);
+      return () => clearTimeout(fallbackTimer);
     }
   }, [booted]);
 
