@@ -1716,8 +1716,8 @@ export default function Home() {
                     className="flex flex-col items-center justify-start min-h-screen relative z-10 p-4 md:p-12 lg:p-20"
                     style={{ position: 'relative' }}
                 >
-                    <div className="flex flex-col-reverse md:flex-row items-center justify-center w-full max-w-7xl mx-auto gap-12">
-                        <div className="w-full md:w-3/5"> {/* Adjusted width for better balance */}
+                    <div className="flex flex-col-reverse md:flex-row items-start justify-center w-full max-w-7xl mx-auto gap-8 md:gap-12">
+                        <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
                             <TerminalLog log={log} onTypingComplete={handleTypingComplete} lightMode={lightMode} isTyping={isTyping} />
                             {activeContent !== null && activeContent.type === 'contact' && (
                               <ContactForm/>
@@ -1742,7 +1742,7 @@ export default function Home() {
                                 )}
                             </AnimatePresence>
                         </div>
-                        <div className="w-full md:w-2/5 flex justify-center"> {/* Adjusted width */}
+                        <div className="w-full md:w-1/2 flex items-center justify-center">
                             <NeuralBlob status={aiStatus} />
                         </div>
                     </div>
