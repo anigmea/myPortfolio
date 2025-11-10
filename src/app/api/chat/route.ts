@@ -46,7 +46,7 @@ CONVERSATION FLOW:
     // Format history for OpenAI
     const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt },
-      ...history.map((turn: any) => ({
+      ...history.map((turn: { role: string; content: string }) => ({
         role: turn.role === 'ai' ? 'assistant' as const : 'user' as const,
         content: turn.content
       })),
