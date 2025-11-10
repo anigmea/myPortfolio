@@ -1724,35 +1724,90 @@ export default function Home() {
                     className="flex flex-col items-center justify-start min-h-screen relative z-10 p-4 md:p-12 lg:p-20"
                     style={{ position: 'relative' }}
                 >
-                    <div className="flex flex-col-reverse md:flex-row items-start justify-center w-full max-w-7xl mx-auto gap-8 md:gap-12">
-                        <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
-                            <TerminalLog log={log} onTypingComplete={handleTypingComplete} lightMode={lightMode} isTyping={isTyping} />
-                            {activeContent !== null && activeContent.type === 'contact' && (
-                              <ContactForm/>
-                            )}
-                            <AnimatePresence>
-                                {(!isTyping || forceShowInput) && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
+                    {/* Neural Blob - Centered at top */}
+                    <div className="flex justify-center w-full mb-8">
+                        <NeuralBlob status={aiStatus} />
+                    </div>
+
+                    {/* History Toggle Button */}
+                    <motion.button
+                        onClick={() => setShowHistory(!showHistory)}
+                        className={`fixed top-20 right-4 z-40 px-4 py-2 rounded-lg border transition-all duration-300 ${
+                            lightMode 
+                                ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100' 
+                                : 'bg-black/80 border-green-500/50 text-green-400 hover:bg-green-500/10'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        {showHistory ? '✕ Close History' : '📜 View History'}
+                    </motion.button>
+
+                    {/* History Panel - Sliding from right */}
+                    <AnimatePresence>
+                        {showHistory && (
+                            <motion.div
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                className={`fixed top-0 right-0 h-full w-full md:w-96 z-50 ${
+                                    lightMode ? 'bg-white border-l border-blue-300' : 'bg-black/95 border-l border-green-500/50'
+                                } shadow-2xl overflow-y-auto p-6`}
+                            >
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className={`text-xl font-bold ${lightMode ? 'text-blue-700' : 'text-green-300'}`}>
+                                        Command History
+                                    </h2>
+                                    <button
+                                        onClick={() => setShowHistory(false)}
+                                        className={`px-3 py-1 rounded ${
+                                            lightMode 
+                                                ? 'hover:bg-blue-100 text-blue-700' 
+                                                : 'hover:bg-green-500/10 text-green-400'
+                                        }`}
                                     >
-                                        <CommandInterface 
-                                          onCommand={handleCommand} 
-                                          disabled={isThinking} 
-                                          isThinking={isThinking} 
-                                          lightMode={lightMode}
-                                          commandHistory={commandHistory}
-                                          historyIndex={historyIndex}
-                                          onHistoryChange={setHistoryIndex}
-                                        />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                                        ✕
+                                    </button>
+                                </div>
+                                <TerminalLog log={log} onTypingComplete={handleTypingComplete} lightMode={lightMode} isTyping={false} />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Contact Form if active */}
+                    {activeContent !== null && activeContent.type === 'contact' && (
+                        <div className="w-full max-w-2xl mx-auto mb-8">
+                            <ContactForm/>
                         </div>
-                        <div className="w-full md:w-1/2 flex items-center justify-center">
-                            <NeuralBlob status={aiStatus} />
-                        </div>
+                    )}
+
+                    {/* Centered Command Input - ChatGPT Style */}
+                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-3xl px-4 z-30">
+                        <AnimatePresence>
+                            {(!isTyping || forceShowInput) && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    className={`rounded-2xl shadow-2xl ${
+                                        lightMode 
+                                            ? 'bg-white border-2 border-blue-300' 
+                                            : 'bg-black/90 border-2 border-green-500/50'
+                                    } backdrop-blur-lg p-4`}
+                                >
+                                    <CommandInterface 
+                                        onCommand={handleCommand} 
+                                        disabled={isThinking} 
+                                        isThinking={isThinking} 
+                                        lightMode={lightMode}
+                                        commandHistory={commandHistory}
+                                        historyIndex={historyIndex}
+                                        onHistoryChange={setHistoryIndex}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                     <ContentDisplay content={activeContent} projects={projects} experience={experience} education={education} lightMode={lightMode} />
                 </motion.div>
