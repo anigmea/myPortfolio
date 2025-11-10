@@ -136,12 +136,13 @@ export const NeuralBlob = memo(function NeuralBlob({ status }: NeuralBlobProps) 
 
   return (
     <div 
-      className="w-full md:w-1/2 flex items-center justify-center p-4" 
+      className="w-full flex items-center justify-center p-4 md:p-8" 
       onMouseMove={handleMouseMove}
-      style={{ minHeight: '480px' }}
+      style={{ minHeight: '500px', position: 'relative' }}
     >
       <motion.div
-        className="relative w-[30rem] h-[30rem] flex items-center justify-center transition-all duration-500 ease-out"
+        className="relative flex items-center justify-center transition-all duration-500 ease-out"
+        style={{ width: '480px', height: '480px' }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: theme.scale, rotate: rotationZ }}
         transition={{ 
