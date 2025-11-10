@@ -42,7 +42,7 @@ CONVERSATION FLOW:
 5. If unclear, ask for clarification.`;
 
     // Initialize the model (using stable version with better quotas)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     // Format history for Gemini
     const chat = model.startChat({
