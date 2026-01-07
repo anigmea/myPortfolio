@@ -3,10 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   // Removed output: "export" to enable API routes on Netlify
-  eslint: {
-    // Note: This bypasses lint errors during production builds (Netlify).
-    ignoreDuringBuilds: true,
-  },
+  // Note: In Next.js 16, ESLint is disabled during builds by default
 };
 
 export default nextConfig;
