@@ -64,6 +64,17 @@ function ensureModelWithTools(apiKey: string) {
     modelWithTools = model.bindTools(
       Object.entries(tools).map(([name, schema]) => {
         const shape = schema.shape;
+        const properties: Record<string, { type: string; description?: string }> = {};
+        
+        // Convert Zod shape to JSON schema properties
+        for (const [key, value] of Object.entries(shape)) {
+          const zodField = value as unknown as { _def: { typeName: string; description?: string } };
+          properties[key] = {
+            type: zodField._def.typeName === 'ZodString' ? 'string' : 'string',
+            description: zodField._def.description,
+          };
+        }
+
         return {
           type: 'function' as const,
           function: {
@@ -71,7 +82,7 @@ function ensureModelWithTools(apiKey: string) {
             description: schema.description,
             parameters: {
               type: 'object',
-              properties: shape,
+              properties,
               required: Object.keys(shape),
             },
           },
