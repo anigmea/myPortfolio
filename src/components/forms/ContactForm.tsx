@@ -14,7 +14,7 @@ export function ContactForm() {
     }
 
     const subject = "Message from Portfolio Contact Form";
-    const mailtoLink = `mailto:DivyanshKanodia11@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    const mailtoLink = `mailto:jobs.divyansh@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
     window.location.href = mailtoLink;
   };
 

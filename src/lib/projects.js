@@ -3,25 +3,18 @@
 // This data can now be easily replaced by a fetch call to a Headless CMS like Sanity or Contentful.
 export const projects = [
     { 
-        title: "Project Alpha", 
-        description: "A machine learning model for stock prediction.", 
-        tech: ["Python", "TensorFlow", "scikit-learn"], 
-        link: "#", 
-        keywords: ["alpha", "stock", "prediction", "machine learning"] 
+        title: "Tic Tac Toe Bot", 
+        description: "Reinforcement learning agent combining Min-Max search with Q-learning to play optimally, logging training runs and reward distributions.", 
+        tech: ["Python", "Reinforcement Learning", "Q-learning", "SQL"], 
+        link: "https://github.com/anigmea/TicTacToe", 
+        keywords: ["tic tac toe", "rl", "q-learning", "min-max"] 
     },
     { 
-        title: "Project Beta", 
-        description: "Decentralized application on the Ethereum blockchain.", 
-        tech: ["Solidity", "React", "Ethers.js"], 
-        link: "#", 
-        keywords: ["beta", "blockchain", "decentralized", "ethereum"] 
-    },
-    { 
-        title: "Project Gamma", 
-        description: "An IoT solution for smart home automation.", 
-        tech: ["Raspberry Pi", "Python", "MQTT"], 
-        link: "#", 
-        keywords: ["gamma", "iot", "home automation", "raspberry pi"] 
+        title: "Frozen Lake Solver", 
+        description: "Q-learning solution for OpenAI Gym’s Frozen Lake with >79% accuracy after 10k+ episodes, applying RL to stochastic navigation.", 
+        tech: ["Python", "Gym", "Reinforcement Learning"], 
+        link: "https://github.com/anigmea/frozen_lake", 
+        keywords: ["frozen lake", "gym", "q-learning", "reinforcement learning"] 
     }
 ];
 

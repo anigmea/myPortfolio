@@ -12,7 +12,11 @@ export function useAIChat() {
   const [isThinking, setIsThinking] = useState(false);
   const [aiStatus, setAiStatus] = useState<AIStatus>('idle');
 
+  // +++ ADD THIS NEW STATE +++
+  const [streamingResponse, setStreamingResponse] = useState<string>('');
+
   const invokeAI = async (prompt: string, history: ChatMessage[]) => {
+    // ... (this function is unchanged)
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -34,9 +38,12 @@ export function useAIChat() {
 
   const processCommand = useCallback(async (command: string) => {
     setLog(prev => [...prev, { type: 'user', text: command }]);
-    setIsTyping(true);
+    setIsTyping(true); // Keep this for the welcome message logic
     setIsThinking(true);
     setAiStatus('thinking');
+    
+    // +++ CLEAR PREVIOUS STREAM +++
+    setStreamingResponse('');
 
     const userMessage: ChatMessage = { role: 'user', content: command };
 
@@ -77,8 +84,11 @@ export function useAIChat() {
           const remainingText = decoder.decode();
           if (remainingText) {
             aiResponseText += remainingText;
+            // (No need to update stream state here, it's done)
           }
+          // +++ ADD FINAL LOG & CLEAR STREAM +++
           setLog(prev => [...prev, { type: 'ai', text: aiResponseText }]);
+          setStreamingResponse('');
           break;
         }
 
@@ -86,6 +96,8 @@ export function useAIChat() {
           const decodedChunk = decoder.decode(value, { stream: true });
           if (decodedChunk) {
             aiResponseText += decodedChunk;
+            // +++ UPDATE STREAMING STATE LIVE +++
+            setStreamingResponse(prev => prev + decodedChunk);
           }
         }
       }
@@ -119,5 +131,6 @@ export function useAIChat() {
     aiStatus,
     setAiStatus,
     processCommand,
+    streamingResponse, // +++ EXPORT THE NEW STATE +++
   };
 }

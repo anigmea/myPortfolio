@@ -3,35 +3,35 @@
 // Experience data for timeline
 export const experience = [
     {
-        year: "2024 - Present",
-        title: "Data Science Student",
-        company: "UC San Diego",
-        description: "Pursuing studies in Data Science and Business Economics. Exploring the intersection of machine learning, econometrics, and design. Building intelligent systems through research projects and coursework.",
-        tech: ["Python", "Machine Learning", "Data Analysis", "Statistical Modeling"],
-        color: "#00FFAA"
-    },
-    {
-        year: "2023 - 2024",
-        title: "AI Research Assistant",
-        company: "UC San Diego Research Lab",
-        description: "Assisted in developing reinforcement learning algorithms for adaptive systems. Worked on neural network optimization and published research on computational learning theory. Contributed to open-source ML frameworks.",
-        tech: ["PyTorch", "TensorFlow", "Python", "Research Methods"],
+        year: "Apr 2025 – Jun 2025",
+        title: "Research Assistant",
+        company: "Tan Labs",
+        description: "Integrating large language models into robotic systems for autonomous decision-making; MATLAB simulations to study adaptation under uncertainty and strategic feedback.",
+        tech: ["LLMs", "MATLAB", "Robotics", "Autonomous Systems"],
         color: "#64B4FF"
     },
     {
-        year: "2022 - 2023",
-        title: "Software Development Intern",
-        company: "Tech Startup",
-        description: "Built scalable full-stack applications using modern frameworks. Improved system performance by 40% through database optimization and caching strategies. Collaborated with cross-functional teams on agile projects.",
-        tech: ["Node.js", "React", "PostgreSQL", "Docker", "AWS"],
+        year: "Apr 2025 – Present",
+        title: "Research Assistant",
+        company: "Undergraduate Economics Lab",
+        description: "Analyzing large-scale Indian labor market datasets; applying econometrics and statistical modeling to study employment outcomes and incentive-driven behavior.",
+        tech: ["Python", "Stata", "Econometrics", "Data Analysis"],
+        color: "#00FFAA"
+    },
+    {
+        year: "Jul 2024 – Sep 2024",
+        title: "Valuation Intern",
+        company: "KPMG",
+        description: "Built transaction and valuation models across multiple sectors; applied optimization-based metrics (EV/EBITDA, EV/Revenue) and authored analysis on macro rate impacts.",
+        tech: ["Financial Modeling", "Optimization", "Research", "Excel"],
         color: "#B469FF"
     },
     {
-        year: "2021 - 2022",
-        title: "Independent Developer",
-        company: "Freelance & Personal Projects",
-        description: "Developed custom web solutions for clients and personal projects. Specialized in full-stack development and responsive design. Created multiple deployed applications showcasing machine learning integrations.",
-        tech: ["JavaScript", "React", "Node.js", "MongoDB", "Python"],
+        year: "Jun 2021 – Mar 2023",
+        title: "Senior Executive of Technology",
+        company: "The Indian Conclave",
+        description: "Led tech infrastructure with PHP/SQL/Python; implemented B2C framework boosting revenue 40%, scaled org from 20 to 50 staff, and mentored a 4-person web team.",
+        tech: ["PHP", "SQL", "Python", "Leadership"],
         color: "#FFDC64"
     }
 ];

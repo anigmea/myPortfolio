@@ -5,63 +5,60 @@ export const education = {
     university: "University of California, San Diego",
     degree: "Bachelor of Science",
     majors: ["Data Science", "Business Economics"],
-    gpa: "3.8",
-    graduationYear: "2025",
+    gpa: "3.9 (Provost Honors)",
+    graduationYear: "2027",
     location: "La Jolla, California",
-    description: "Pursuing a double major in Data Science and Business Economics, exploring the intersection of quantitative analysis, machine learning, and economic theory. Focused on building intelligent systems that can analyze complex data patterns and inform strategic decision-making.",
+    description: "Data Science and Business Economics student combining machine learning, econometrics, and optimization to analyze complex systems and strategic decision-making.",
     
     // Key course modules organized by category
     modules: {
         "Core Data Science": [
-            "Machine Learning Fundamentals",
-            "Statistical Methods for Data Science", 
-            "Data Structures and Algorithms",
+            "Machine Learning",
+            "Introduction to Data Science",
+            "Data Structures & Algorithms",
+            "Programming and Computational Problem-Solving",
             "Database Systems",
-            "Data Visualization",
-            "Big Data Analytics"
+            "Data Visualization"
         ],
         "Business Economics": [
-            "Microeconomic Theory",
-            "Macroeconomic Analysis", 
+            "Microeconomics",
+            "Macroeconomics", 
             "Econometrics",
-            "Financial Markets",
             "Game Theory",
-            "Behavioral Economics"
+            "Optimization",
+            "Financial Markets"
         ],
         "Advanced Computing": [
-            "Deep Learning",
-            "Natural Language Processing",
-            "Computer Vision",
-            "Distributed Systems",
+            "Reinforcement Learning",
+            "Simulation Design",
             "Cloud Computing",
-            "Software Engineering"
+            "Software Engineering",
+            "Asynchronous Programming"
         ],
         "Mathematics & Statistics": [
             "Linear Algebra",
             "Probability Theory",
             "Statistical Inference",
             "Calculus",
-            "Optimization Theory",
-            "Time Series Analysis"
+            "Optimization Theory"
         ]
     },
     
     // Notable achievements and projects
     achievements: [
-        "Dean's List - Multiple Quarters",
-        "Undergraduate Research Assistant",
-        "Machine Learning Competition Winner",
-        "Data Science Club President",
-        "Published Research Paper on Reinforcement Learning"
+        "Provost Honors",
+        "Undergraduate Research Assistant, Tan Labs (LLMs + robotics)",
+        "Undergraduate Research Assistant, Economics Lab (labor markets)",
+        "IPPF Debate Top 32 globally (research-driven competition)"
     ],
     
     // Research interests
     researchInterests: [
-        "Machine Learning Applications in Economics",
-        "Behavioral Data Analysis",
-        "Algorithmic Trading Systems",
-        "Human-AI Interaction Design",
-        "Predictive Analytics for Business Intelligence"
+        "Reinforcement learning for decision-making",
+        "Game theory and strategic behavior",
+        "Labor market analytics",
+        "LLM-enabled robotics",
+        "Economic modeling and optimization"
     ]
 };
 

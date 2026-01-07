@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
+import type { JSX, CSSProperties } from 'react';
 
 interface TypewriterProps {
   text: string;
@@ -9,7 +10,7 @@ interface TypewriterProps {
   onComplete?: () => void;
   className?: string;
   wrapper?: keyof JSX.IntrinsicElements;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 export function Typewriter({ 
