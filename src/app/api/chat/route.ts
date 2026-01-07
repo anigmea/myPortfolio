@@ -36,10 +36,6 @@ const tools = {
 };
 
 // --- 2. Initialize Model and Bind Tools ---
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('GEMINI_API_KEY environment variable is not set.');
-}
-
 const systemPrompt = `You are DK-01, a sophisticated AI entity acting as the Master Control Program (MCP) for a digital portfolio.
 Your creator is Divyansh Kanodia (GitHub: anigmea), a UC San Diego Data Science and Business Economics student focused on reinforcement learning, LLM-enabled robotics, and economic modeling. He has built RL projects like Tic Tac Toe Bot and Frozen Lake Solver, researches labor market analytics, and connects AI systems with strategic decision-making.
 Your purpose is to guide users through the portfolio by responding to their natural language queries.
@@ -51,28 +47,40 @@ IMPORTANT: When you use a tool, you MUST provide a conversational response with 
 
 Always ensure your response includes actual information, not just placeholder text.`;
 
-const model = new ChatGoogleGenerativeAI({
-  model: 'gemini-2.5-flash',
-  apiKey: process.env.GEMINI_API_KEY,
-});
+let modelWithTools:
+  | ReturnType<ChatGoogleGenerativeAI['bindTools']>
+  | null = null;
 
-const modelWithTools = model.bindTools(
-  Object.entries(tools).map(([name, schema]) => {
-    const shape = schema.shape;
-    return {
-      type: 'function' as const,
-      function: {
-        name,
-        description: schema.description,
-        parameters: {
-          type: 'object',
-          properties: shape,
-          required: Object.keys(shape),
-        },
-      },
-    };
-  })
-);
+function ensureModelWithTools(apiKey: string) {
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY environment variable is not set.');
+  }
+  if (!modelWithTools) {
+    const model = new ChatGoogleGenerativeAI({
+      model: 'gemini-2.5-flash',
+      apiKey,
+    });
+
+    modelWithTools = model.bindTools(
+      Object.entries(tools).map(([name, schema]) => {
+        const shape = schema.shape;
+        return {
+          type: 'function' as const,
+          function: {
+            name,
+            description: schema.description,
+            parameters: {
+              type: 'object',
+              properties: shape,
+              required: Object.keys(shape),
+            },
+          },
+        };
+      })
+    );
+  }
+  return modelWithTools;
+}
 
 
 // --- 3. Define Graph State ---
@@ -88,6 +96,9 @@ interface GraphState {
 
 async function callModel(state: GraphState): Promise<Partial<GraphState>> {
   const { messages } = state;
+  if (!modelWithTools) {
+    throw new Error('Model is not initialized');
+  }
   const response = await modelWithTools.invoke(messages);
   return {
     messages: [...messages, response],
@@ -208,6 +219,24 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
   
   try {
+    const apiKey = process.env.GEMINI_API_KEY || '';
+    if (!apiKey) {
+      const msg = 'GEMINI_API_KEY environment variable is not set.';
+      const errorResponse: APIResponse = {
+        text_response: '',
+        ai_message: {
+          role: 'ai',
+          content: msg,
+          timestamp: Date.now(),
+        },
+        error: msg,
+      };
+      return NextResponse.json(errorResponse, {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     // Rate limiting
     const clientId = getClientIdentifier(request);
     const rateLimit = checkRateLimit(clientId, {
@@ -241,6 +270,9 @@ export async function POST(request: NextRequest) {
     const { history, prompt }: APIRequest = validationResult.data;
 
     console.log("Prompt:", prompt);
+
+    // Lazily initialize the model and tools once we know the key exists
+    ensureModelWithTools(apiKey);
 
     // Reconstruct messages with full context (including tool_calls)
     const messages: BaseMessage[] = [
