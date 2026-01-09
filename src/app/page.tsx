@@ -6,6 +6,7 @@ import { Github, Linkedin, Mail, Search, Download, Copy } from 'lucide-react';
 import { getProjects } from '../lib/projects';
 import { getExperience } from '../lib/experience';
 import { getEducation } from '../lib/education';
+import { getResources } from '../lib/resources';
 
 // --- COMPONENT IMPORTS ---
 import { NeuralBlob } from "@/components/neural/NeuralBlob";
@@ -18,6 +19,7 @@ import { ToastContainer } from "@/components/ui/Toast";
 import { SearchModal } from "@/components/ui/SearchModal";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { PortfolioAnalytics } from "@/components/dataScience/PortfolioAnalytics";
+import { SkillsGrid } from "@/components/dataScience/SkillsGrid";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
 // Lazy load heavy components
@@ -38,7 +40,6 @@ import {
 } from '@/types';
 import { showToast } from '@/lib/utils/toast';
 import { exportConversation, downloadText, copyToClipboard } from '@/lib/utils/export';
-import { time } from "console";
 
 interface TimelineBikeProps {
   experience: Experience[];
@@ -47,8 +48,8 @@ interface TimelineBikeProps {
 const TimelineBike = memo(function TimelineBike({ experience }: TimelineBikeProps) {
   const [scrollY, setScrollY] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const containerRef = useRef<any>(null);
-  const timelineRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const [timelineHeight, setTimelineHeight] = useState(0);
   const [timelineTop, setTimelineTop] = useState(0);
 
@@ -365,20 +366,70 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
     if (!content) return null;
     const renderContent = () => {
       switch(content.type) {
-          case 'projects':
-              return (
-                  <div>
-                      <h2 className={`text-3xl font-bold mb-4 ${lightMode ? 'text-blue-600' : 'text-green-200'}`}>Projects</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {projects.map((p: any) => (
-                              <a href={p.link} key={p.title} className="border border-green-500/50 p-4 rounded-lg hover:bg-green-500/10 transition-colors block">
-                                  <h3 className="text-xl font-bold text-green-300">{p.title}</h3>
-                                  <p className="text-green-400 mt-1">{p.description}</p>
-                              </a>
-                          ))}
+        case 'projects':
+          const projectsBySubject = projects.reduce((acc: any, project: any) => {
+            const subject = project.subject;
+            if (!acc[subject]) acc[subject] = [];
+            acc[subject].push(project);
+            return acc;
+        }, {});
+        
+          return (
+              <div>
+                  <h2 className={`text-3xl font-bold mb-6 ${lightMode ? 'text-blue-600' : 'text-green-200'}`}>
+                      Projects
+                  </h2>
+      
+                  {Object.entries(projectsBySubject).map(([subject, subjectProjects]: any) => (
+                      <div key={subject} className="mb-8">
+                          {/* Subject Heading */}
+                          <h3 className="text-2xl font-semibold mb-4 text-green-400">
+                              {subject}
+                          </h3>
+      
+                          {/* Projects Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {subjectProjects.map((p: any) => {
+                                const isResearch = p.subject === 'Research';
+                                const isFileLink = typeof p.link === 'string' && p.link.startsWith('/research/');
+                                return (
+                                  <div
+                                    key={p.title}
+                                    className="border border-green-500/50 p-4 rounded-lg bg-black/40 hover:bg-green-500/10 transition-colors flex flex-col justify-between"
+                                  >
+                                    <div>
+                                      <h4 className="text-xl font-bold text-green-300">
+                                          {p.title}
+                                      </h4>
+                                      <p className="text-green-400 mt-1">
+                                          {p.description}
+                                      </p>
+                                    </div>
+                                    {p.link && (
+                                      <div className="mt-4">
+                                        <a
+                                          href={p.link}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium border ${
+                                            isResearch
+                                              ? 'border-cyan-400 text-cyan-200 hover:bg-cyan-500/20'
+                                              : 'border-green-400 text-green-200 hover:bg-green-500/20'
+                                          }`}
+                                        >
+                                          {isResearch && isFileLink ? 'View paper (PDF)' : 'View project'}
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                          </div>
                       </div>
-                  </div>
-              );
+                  ))}
+              </div>
+          );
+      
           case 'education':
               return (
                   <div className="space-y-8">
@@ -418,7 +469,7 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
                               Areas of Study
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {education.majors.map((major: any, index: any) => (
+                              {education.majors.map((major: string, index: number) => (
                                   <div key={index} className={`p-4 rounded-lg ${lightMode ? 'bg-white border border-green-200' : 'bg-black/40 border border-green-500/30'}`}>
                                       <h4 className={`text-lg font-bold ${lightMode ? 'text-green-700' : 'text-green-300'}`}>
                                           {major}
@@ -434,20 +485,23 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
                               Key Course Modules
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {Object.entries(education.modules).map(([category, courses]: any) => (
+                              {Object.entries(education.modules).map(([category, courses]) => {
+                                const courseList = Array.isArray(courses) ? courses : [];
+                                return (
                                   <div key={category} className={`p-4 rounded-lg ${lightMode ? 'bg-white border border-purple-200' : 'bg-black/40 border border-purple-500/30'}`}>
                                       <h4 className={`text-lg font-bold mb-3 ${lightMode ? 'text-purple-700' : 'text-purple-300'}`}>
                                           {category}
                                       </h4>
                                       <ul className="space-y-1">
-                                          {courses.map((course: any, index: any) => (
+                                          {courseList.map((course: string, index: number) => (
                                               <li key={index} className={`text-sm ${lightMode ? 'text-purple-600' : 'text-purple-400'}`}>
                                                   • {course}
                                               </li>
                                           ))}
                                       </ul>
                                   </div>
-                              ))}
+                                );
+                              })}
                           </div>
                       </div>
 
@@ -499,8 +553,20 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
               );
           case 'help':
               return (
-                  <div className="space-y-4">
-                      <h2 className={`text-3xl font-bold mb-6 ${lightMode ? 'text-blue-600' : 'text-green-200'}`}>Available Commands</h2>
+                  <div className="space-y-8">
+                      <h2 className={`text-3xl font-bold mb-3 ${lightMode ? 'text-blue-600' : 'text-green-200'}`}>
+                        Command & Shortcut Reference
+                      </h2>
+                      <p className={lightMode ? 'text-blue-700 text-sm' : 'text-green-200/80 text-sm'}>
+                        You can either type the exact commands below or just use natural language like
+                        {" "}
+                        <span className="font-mono">"show my projects"</span>,
+                        {" "}
+                        <span className="font-mono">"open education"</span>, or
+                        {" "}
+                        <span className="font-mono">"what are your skills"</span>. 
+                        DK‑01 will route you to the right view.
+                      </p>
                       <div className={`border rounded-lg p-6 ${lightMode ? 'border-blue-300 bg-blue-50' : 'border-green-500/50 bg-black/20'}`}>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
                               <div className="space-y-2">
@@ -511,6 +577,7 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
                                       <div>intelligence - List technical skills</div>
                                       <div>education - Display academic background</div>
                                       <div>contact - Show contact channels</div>
+                                      <div>analytics - Show portfolio analytics</div>
                                   </div>
                               </div>
                               <div className="space-y-2">
@@ -531,13 +598,51 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
                                   </div>
                               </div>
                               <div className="space-y-2">
-                                  <div className={`text-lg font-bold ${lightMode ? 'text-blue-700' : 'text-green-300'}`}>Navigation</div>
+                                  <div className={`text-lg font-bold ${lightMode ? 'text-blue-700' : 'text-green-300'}`}>Keyboard Shortcuts</div>
                                   <div className={`text-sm ${lightMode ? 'text-blue-600' : 'text-green-400'}`}>
-                                      <div>↑/↓ - Navigate command history</div>
-                                      <div>Tab - Auto-complete (coming soon)</div>
+                                      <div>Ctrl / Cmd + K - Open search</div>
+                                      <div>Ctrl / Cmd + E - Export conversation</div>
+                                      <div>Ctrl / Cmd + L - Clear console</div>
+                                      <div>? - Toggle shortcuts overlay</div>
+                                      <div>Esc - Close modals</div>
+                                      <div>↑ / ↓ - Navigate command history</div>
                                   </div>
                               </div>
                           </div>
+                      </div>
+
+                      {/* Reading List / Resources */}
+                      <div className={`border rounded-lg p-6 ${lightMode ? 'border-purple-300 bg-purple-50' : 'border-purple-500/50 bg-black/20'}`}>
+                        <h3 className={`text-xl font-bold mb-4 ${lightMode ? 'text-purple-700' : 'text-purple-300'}`}>
+                          Reading List & Resources
+                        </h3>
+                        <p className={lightMode ? 'text-purple-800 text-sm mb-3' : 'text-purple-100/80 text-sm mb-3'}>
+                          A few inputs that shaped how I think about reinforcement learning, systems, and markets.
+                        </p>
+                        <div className="space-y-3 text-sm">
+                          {getResources().map((r: any) => (
+                            <div key={r.title} className="flex flex-col">
+                              <div className="flex items-center justify-between gap-2">
+                                <a
+                                  href={r.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={lightMode ? 'text-purple-800 font-semibold underline' : 'text-purple-200 font-semibold underline'}
+                                >
+                                  {r.title}
+                                </a>
+                                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                  lightMode ? 'bg-purple-200 text-purple-800' : 'bg-purple-900/60 text-purple-200'
+                                }`}>
+                                  {r.category}
+                                </span>
+                              </div>
+                              <p className={lightMode ? 'text-purple-900/80 mt-1' : 'text-purple-100/70 mt-1'}>
+                                {r.note}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                   </div>
               );
@@ -590,6 +695,9 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
                     </li>
                   </ul>
                 </div>
+
+                {/* Skills Visualization */}
+                <SkillsGrid lightMode={lightMode} />
               
                 <div>
                   <h2 className="text-3xl font-bold mb-4 text-purple-200">Consciousness</h2>
@@ -629,14 +737,82 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
               );
           case 'contact':
               return (
-                  <div>
-                      <h2 className="text-3xl font-bold mb-4 text-blue-200">Contact</h2>
-                      <p></p>
-                      <p>You can connect with my creator through the following channels:</p>
-                      <div className="flex space-x-6 mt-4 items-center">
-                          <a href="https://github.com/anigmea" className="text-blue-300 hover:text-blue-100 transition-colors"><Github size={36} /></a>
-                          <a href="https://www.linkedin.com/in/divyansh-kanodia-0978611a9/" className="text-blue-300 hover:text-blue-100 transition-colors"><Linkedin size={36} /></a>
-                          <a href="mailto:jobs.divyansh@gmail.com" className="text-blue-300 hover:text-blue-100 transition-colors"><Mail size={36} /></a>
+                  <div className="space-y-6">
+                      <h2 className={`text-3xl font-bold ${lightMode ? 'text-blue-700' : 'text-blue-200'}`}>
+                        Contact & Collaboration
+                      </h2>
+                      <p className={lightMode ? 'text-gray-700' : 'text-blue-100/80'}>
+                        Whether you’re exploring RL research, data products, or AI‑driven systems, this is the fastest path to my creator.
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        {/* Left: quick info + social links */}
+                        <div
+                          className={`rounded-xl border p-5 ${
+                            lightMode ? 'border-blue-200 bg-blue-50' : 'border-blue-500/40 bg-black/40'
+                          }`}
+                        >
+                          <h3 className={`text-xl font-semibold mb-3 ${lightMode ? 'text-blue-800' : 'text-blue-200'}`}>
+                            Direct channels
+                          </h3>
+                          <p className={lightMode ? 'text-gray-800 text-sm mb-4' : 'text-blue-100/80 text-sm mb-4'}>
+                            I’m most responsive on email and LinkedIn. GitHub is the best place to explore code and experiments.
+                          </p>
+                          <div className="flex flex-wrap gap-4 items-center">
+                            <a
+                              href="https://github.com/anigmea"
+                              className="inline-flex items-center gap-2 text-blue-300 hover:text-blue-100 transition-colors"
+                            >
+                              <Github size={24} />
+                              <span className="text-sm">GitHub</span>
+                            </a>
+                            <a
+                              href="https://www.linkedin.com/in/divyansh-kanodia-0978611a9/"
+                              className="inline-flex items-center gap-2 text-blue-300 hover:text-blue-100 transition-colors"
+                            >
+                              <Linkedin size={24} />
+                              <span className="text-sm">LinkedIn</span>
+                            </a>
+                            <a
+                              href="mailto:jobs.divyansh@gmail.com"
+                              className="inline-flex items-center gap-2 text-blue-300 hover:text-blue-100 transition-colors"
+                            >
+                              <Mail size={24} />
+                              <span className="text-sm">Email</span>
+                            </a>
+                          </div>
+                          <div className="mt-5 space-y-2 text-xs text-blue-100/80">
+                            <div className="font-semibold uppercase tracking-wide text-[10px] opacity-80">
+                              Snapshot
+                            </div>
+                            <p>- Based in: San Diego, CA</p>
+                            <p>- Focus: RL, LLM + robotics, labor & market analytics</p>
+                          </div>
+                          <div className="mt-5">
+                            <a
+                              href="/resume.pdf"
+                              download
+                              className="inline-flex items-center px-4 py-2 rounded-md text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                            >
+                              Download Resume (PDF)
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* Right: inline contact form */}
+                        <div
+                          className={`rounded-xl border p-5 ${
+                            lightMode ? 'border-green-200 bg-white' : 'border-green-500/40 bg-black/60'
+                          }`}
+                        >
+                          <h3 className={`text-xl font-semibold mb-3 ${lightMode ? 'text-green-800' : 'text-green-200'}`}>
+                            Send a message
+                          </h3>
+                          <p className={lightMode ? 'text-gray-700 text-sm mb-3' : 'text-green-100/80 text-sm mb-3'}>
+                            This opens your email client with a prefilled draft. Feel free to include context, links, or a short brief.
+                          </p>
+                          <ContactForm />
+                        </div>
                       </div>
                   </div>
               );
@@ -679,6 +855,7 @@ export default function Home() {
   const [showHistory, setShowHistory] = useState(false);
   const [activeContent, setActiveContent] = useState<ContentDisplayProps | null>(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   
   // We manage this state locally now
   const [log, setLog] = useState<LogEntry[]>([]);
@@ -720,10 +897,16 @@ export default function Home() {
         setLog([{ type: 'system', text: 'Console cleared. \n> [ Awaiting command... ]' }]);
         setConversationHistory([]);
       }
+      // ? key to toggle shortcuts modal (no modifiers)
+      if (!e.ctrlKey && !e.metaKey && e.key === '?') {
+        e.preventDefault();
+        setShowShortcuts(prev => !prev);
+      }
       // Escape to close modals
       if (e.key === 'Escape') {
         setShowSearch(false);
         setShowHistory(false);
+        setShowShortcuts(false);
       }
     };
 
@@ -976,7 +1159,62 @@ export default function Home() {
           onSelectResult={handleSearchResult}
         />
 
-        {/* Top Action Buttons */}
+        {/* Keyboard Shortcuts Modal */}
+        <AnimatePresence>
+          {showShortcuts && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+              onClick={() => setShowShortcuts(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                className={`w-full max-w-md rounded-xl border p-6 shadow-xl ${
+                  lightMode ? 'bg-white border-blue-200 text-gray-900' : 'bg-black border-green-500/40 text-green-100'
+                }`}
+              >
+                <h2 className="text-xl font-bold mb-4">Keyboard Shortcuts</h2>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-mono">Ctrl / Cmd + K</span>
+                    <span>Open search</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-mono">Ctrl / Cmd + E</span>
+                    <span>Export conversation</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-mono">Ctrl / Cmd + L</span>
+                    <span>Clear console</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-mono">?</span>
+                    <span>Toggle this shortcuts menu</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-mono">Esc</span>
+                    <span>Close modals</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowShortcuts(false)}
+                  className={`mt-4 px-3 py-1 rounded-md text-sm font-medium ${
+                    lightMode ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' : 'bg-green-900/40 text-green-200 hover:bg-green-900/70'
+                  }`}
+                >
+                  Close
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Top Action Buttons – keep this minimal */}
         <div className="fixed top-4 right-4 z-50 flex gap-2 items-center">
           {/* Language Switcher */}
           <LanguageSwitcher lightMode={lightMode} />
@@ -993,34 +1231,6 @@ export default function Home() {
             title={`${t('search')} (Ctrl+K)`}
           >
             <Search size={20} />
-          </button>
-          
-          {/* Export Button */}
-          <button
-            onClick={handleExportConversation}
-            className={`p-2 rounded-lg transition-all duration-300 hover:opacity-70 ${
-              lightMode
-                ? 'bg-blue-100 hover:bg-blue-200 text-blue-700'
-                : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'
-            }`}
-            aria-label={`${t('export')} (Ctrl+E)`}
-            title={`${t('export')} (Ctrl+E)`}
-          >
-            <Download size={20} />
-          </button>
-          
-          {/* Copy Button */}
-          <button
-            onClick={handleCopyLog}
-            className={`p-2 rounded-lg transition-all duration-300 hover:opacity-70 ${
-              lightMode
-                ? 'bg-blue-100 hover:bg-blue-200 text-blue-700'
-                : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'
-            }`}
-            aria-label={t('copy')}
-            title={t('copy')}
-          >
-            <Copy size={20} />
           </button>
           
           {/* Theme Toggle Button */}
@@ -1150,13 +1360,6 @@ export default function Home() {
                     </div>
                     {/* === END OF NEW BLOCK === */}
 
-                    {/* Contact Form if active */}
-                    {activeContent !== null && activeContent.type === 'contact' && (
-                        <div className="w-full max-w-2xl mx-auto mb-8">
-                            <ContactForm/>
-                        </div>
-                    )}
-
                     {/* Centered Command Input - FIXED positioning */}
                     <div className="w-full max-w-3xl px-4 z-30">
                         <AnimatePresence>
@@ -1194,8 +1397,7 @@ export default function Home() {
           {matrixActive && (
             <MatrixRain 
               isActive={matrixActive} 
-              onClick={() => setMatrixActive(false)}
-              onComplete={() => setMatrixActive(false)} 
+              onComplete={() => setMatrixActive(false)}
             />
           )}
         </Suspense>

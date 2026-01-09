@@ -1,13 +1,31 @@
 import { useEffect, useState, useRef, memo } from "react";
 
-export const MatrixRain = memo(function MatrixRain({ isActive, onComplete }: any) {
-  const [columns, setColumns] = useState<any[]>([]);
-  const containerRef = useRef<any>(null);
+interface MatrixRainProps {
+  isActive: boolean;
+  onComplete?: () => void;
+}
+
+interface Drop {
+  id: string;
+  y: number;
+  char: string;
+  speed: number;
+}
+
+interface Column {
+  id: number;
+  x: number;
+  drops: Drop[];
+}
+
+export const MatrixRain = memo(function MatrixRain({ isActive, onComplete }: MatrixRainProps) {
+  const [columns, setColumns] = useState<Column[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Handle Escape key
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && onComplete) {
         onComplete(); // ✅ close animation
       }
     }
@@ -47,10 +65,10 @@ export const MatrixRain = memo(function MatrixRain({ isActive, onComplete }: any
 
     const interval = setInterval(() => {
       setColumns((prev) =>
-        prev.map((col: any) => ({
+        prev.map((col) => ({
           ...col,
           drops: col.drops
-            .map((drop: any) => ({
+            .map((drop) => ({
               ...drop,
               y: drop.y + drop.speed,
               char:
@@ -58,7 +76,7 @@ export const MatrixRain = memo(function MatrixRain({ isActive, onComplete }: any
                   ? characters[Math.floor(Math.random() * characters.length)]
                   : drop.char,
             }))
-            .filter((drop: any) => drop.y < window.innerHeight + 50)
+            .filter((drop) => drop.y < window.innerHeight + 50)
             .concat(
               Math.random() < 0.3
                 ? [
@@ -78,7 +96,9 @@ export const MatrixRain = memo(function MatrixRain({ isActive, onComplete }: any
 
     const timeout = setTimeout(() => {
       clearInterval(interval);
-      onComplete(); // end animation
+      if (onComplete) {
+        onComplete(); // end animation
+      }
     }, 10000);
 
     return () => {
@@ -95,8 +115,8 @@ export const MatrixRain = memo(function MatrixRain({ isActive, onComplete }: any
       className="fixed inset-0 z-50 pointer-events-none"
       style={{ background: "rgba(0, 0, 0, 0.8)" }}
     >
-      {columns.flatMap((col: any) =>
-        col.drops.map((drop: any) => (
+      {columns.flatMap((col) =>
+        col.drops.map((drop) => (
           <div
             key={drop.id}
             className="absolute text-green-400 font-mono text-sm"

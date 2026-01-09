@@ -132,12 +132,16 @@ async function handleTool(state: GraphState): Promise<Partial<GraphState>> {
     case 'show_projects_list':
       ui_update = { type: 'setActiveContent', payload: { type: 'projects' } };
       break;
-    case 'show_project_details':
+    case 'show_project_details': {
+      const projectName = typeof args === 'object' && args !== null && 'project_name' in args 
+        ? String(args.project_name) 
+        : '';
       ui_update = {
         type: 'setActiveContent',
-        payload: { type: 'specific_project', title: (args as any).project_name },
+        payload: { type: 'specific_project', title: projectName },
       };
       break;
+    }
     case 'show_intelligence':
       ui_update = { type: 'setActiveContent', payload: { type: 'intelligence' } };
       break;
@@ -228,6 +232,7 @@ const requestSchema = z.object({
 // --- 8. Create the POST Handler ---
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
+  let rateLimit: ReturnType<typeof checkRateLimit> | null = null;
   
   try {
     const apiKey = process.env.GEMINI_API_KEY || '';
@@ -250,7 +255,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const clientId = getClientIdentifier(request);
-    const rateLimit = checkRateLimit(clientId, {
+    rateLimit = checkRateLimit(clientId, {
       maxRequests: 20,
       windowMs: 60000, // 1 minute
     });
@@ -282,6 +287,91 @@ export async function POST(request: NextRequest) {
 
     console.log("Prompt:", prompt);
 
+    // --- Fast path for simple, known commands (avoid model latency/timeouts) ---
+    const normalizedPrompt = prompt.trim().toLowerCase();
+
+    type FastPathConfig = {
+      match: (p: string) => boolean;
+      ui_update: APIResponse['ui_update'];
+      text: string;
+    };
+
+    const fastPaths: FastPathConfig[] = [
+      {
+        match: (p) => ['projects', 'show projects', 'project list'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'projects' } },
+        text: 'Accessing project index and updating the interface to show all projects.',
+      },
+      {
+        match: (p) => ['experience', 'show experience', 'work experience'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'experience' } },
+        text: 'Bringing up the experience timeline.',
+      },
+      {
+        match: (p) => ['education', 'show education', 'academics', 'academic profile'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'education' } },
+        text: 'Loading academic profile and coursework.',
+      },
+      {
+        match: (p) => ['intelligence', 'skills', 'show intelligence', 'show skills'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'intelligence' } },
+        text: 'Summarizing core skills and capabilities.',
+      },
+      {
+        match: (p) => ['contact', 'show contact', 'contact info'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'contact' } },
+        text: 'Surfacing contact channels.',
+      },
+      {
+        match: (p) => ['status', 'system status', 'dashboard', 'show system status'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'system_status' } },
+        text: 'Rendering system status dashboard.',
+      },
+      {
+        match: (p) => ['analytics', 'show analytics', 'portfolio analytics'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'analytics' } },
+        text: 'Computing portfolio analytics and insights.',
+      },
+      {
+        match: (p) => ['help', 'show help', 'commands'].includes(p),
+        ui_update: { type: 'setActiveContent', payload: { type: 'help' } },
+        text: 'Displaying available commands and navigation tips.',
+      },
+      {
+        match: (p) => ['play a game', 'game', 'start game'].includes(p),
+        ui_update: { type: 'setGameActive', payload: true },
+        text: 'Booting up the text adventure game.',
+      },
+      {
+        match: (p) => ['matrix', 'show matrix', 'digital rain'].includes(p),
+        ui_update: { type: 'setMatrixActive', payload: true },
+        text: 'Engaging Matrix visual effect.',
+      },
+    ];
+
+    const matchedFastPath = fastPaths.find((fp) => fp.match(normalizedPrompt));
+    if (matchedFastPath) {
+      const { ui_update, text } = matchedFastPath;
+      const ai_message_for_history: ChatMessage = {
+        role: 'ai',
+        content: text,
+        timestamp: Date.now(),
+      };
+
+      const response: APIResponse = {
+        text_response: text,
+        ui_update,
+        ai_message: ai_message_for_history,
+      };
+
+      return NextResponse.json(response, {
+        headers: {
+          'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'X-RateLimit-Reset': rateLimit.resetTime.toString(),
+        },
+      });
+    }
+
     // Lazily initialize the model and tools once we know the key exists
     ensureModelWithTools(apiKey);
 
@@ -311,9 +401,10 @@ export async function POST(request: NextRequest) {
     // Pass a unique thread_id for every request to ensure a stateless run
     const threadId = Date.now().toString();
 
-    // Add timeout for AI processing
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Request timeout')), 30000); // 30 second timeout
+    // Add timeout for AI processing (in ms)
+    const TIMEOUT_MS = 60000; // 60 seconds
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(`Request timeout after ${TIMEOUT_MS / 1000}s`)), TIMEOUT_MS);
     });
 
     const finalState = await Promise.race([
@@ -341,17 +432,18 @@ export async function POST(request: NextRequest) {
         .map(part => {
           if (typeof part === "string") {
             return part;
-          } else if (part && typeof part === "object" && part.type === "text") {
-            return (part as any).text || "";
+          } else if (part && typeof part === "object" && "type" in part && part.type === "text" && "text" in part) {
+            return String(part.text) || "";
           }
           return "";
         })
         .filter(text => text.trim() !== "")
         .join("\n")
         .trim();
-    } else if (lastMessage.content && typeof lastMessage.content === "object") {
+    } else if (lastMessage.content && typeof lastMessage.content === "object" && "text" in lastMessage.content) {
       // Handle case where content might be an object with text property
-      text_response = (lastMessage.content as any).text || "";
+      const contentWithText = lastMessage.content as { text: unknown };
+      text_response = String(contentWithText.text) || "";
     }
 
     // Create a serializable AI message to send back to the client
@@ -389,8 +481,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response, {
       headers: {
-        'X-RateLimit-Remaining': rateLimit.remaining.toString(),
-        'X-RateLimit-Reset': rateLimit.resetTime.toString(),
+        'X-RateLimit-Remaining': (rateLimit?.remaining ?? 0).toString(),
+        'X-RateLimit-Reset': (rateLimit?.resetTime ?? Date.now()).toString(),
       },
     });
   } catch (error) {

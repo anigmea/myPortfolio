@@ -12,23 +12,41 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
+  // Initialize with 'en' to match SSR, then update on client
   const [language, setLanguageState] = useState<Language>('en');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang && translations[savedLang]) {
-      setLanguageState(savedLang);
-    } else {
-      const browserLang = navigator.language.split('-')[0] as Language;
-      if (translations[browserLang]) {
-        setLanguageState(browserLang);
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
+    setIsMounted(true);
+
+    try {
+      const savedLang = localStorage.getItem('language') as Language;
+      if (savedLang && translations[savedLang]) {
+        setLanguageState(savedLang);
+      } else if (typeof navigator !== 'undefined') {
+        const browserLang = navigator.language.split('-')[0] as Language;
+        if (translations[browserLang]) {
+          setLanguageState(browserLang);
+        }
       }
+    } catch (error) {
+      console.warn('Failed to load language preference:', error);
     }
   }, []);
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('language', lang);
+    // Only access localStorage on client side
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('language', lang);
+      } catch (error) {
+        console.warn('Failed to save language preference:', error);
+      }
+    }
   }, []);
 
   const t = useCallback(

@@ -1,10 +1,21 @@
 
 import { useEffect, useState, useMemo, useRef, memo, useCallback } from "react";
 
-export const SystemStatusDashboard = memo(function SystemStatusDashboard({ lightMode }: any) {
+interface SystemStatusDashboardProps {
+  lightMode: boolean;
+}
+
+interface GitHubData {
+  publicRepos?: number;
+  followers?: number;
+  following?: number;
+  lastUpdate?: string;
+}
+
+export const SystemStatusDashboard = memo(function SystemStatusDashboard({ lightMode }: SystemStatusDashboardProps) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [uptime, setUptime] = useState(0);
-    const [githubData, setGithubData] = useState<any>(null);
+    const [githubData, setGithubData] = useState<GitHubData | null>(null);
     const [startTime] = useState(Date.now());
   
     // Update time every second
@@ -38,7 +49,7 @@ export const SystemStatusDashboard = memo(function SystemStatusDashboard({ light
       fetchGitHubData();
     }, []);
   
-    const formatUptime = (seconds: any) => {
+    const formatUptime = (seconds: number) => {
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       const secs = seconds % 60;
@@ -86,13 +97,13 @@ export const SystemStatusDashboard = memo(function SystemStatusDashboard({ light
             {githubData ? (
               <div className="space-y-1">
                 <div className={`text-lg font-mono ${lightMode ? 'text-purple-600' : 'text-purple-400'}`}>
-                  {githubData.publicRepos} repos
+                  {githubData.publicRepos ?? 0} repos
                 </div>
                 <div className={`text-sm ${lightMode ? 'text-purple-500' : 'text-purple-500'}`}>
-                  {githubData.followers} followers
+                  {githubData.followers ?? 0} followers
                 </div>
                 <div className={`text-xs ${lightMode ? 'text-purple-400' : 'text-purple-600'}`}>
-                  Updated: {githubData.lastUpdate}
+                  Updated: {githubData.lastUpdate ?? 'Never'}
                 </div>
               </div>
             ) : (
