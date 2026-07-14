@@ -1023,17 +1023,6 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // dk-command event: fired by TopNav and other external triggers
-  useEffect(() => {
-    const handleDkCommand = (e: Event) => {
-      const command = (e as CustomEvent<{ command: string }>).detail.command;
-      if (command && !isThinking) {
-        handleCommand(command);
-      }
-    };
-    window.addEventListener('dk-command', handleDkCommand);
-    return () => window.removeEventListener('dk-command', handleDkCommand);
-  }, [handleCommand, isThinking]);
 
   useEffect(() => {
     setProjects(getProjects());
@@ -1263,6 +1252,18 @@ export default function Home() {
     },
     [conversationHistory, lightMode] // Dependencies - use conversationHistory instead of log
   );
+
+  // dk-command event: fired by TopNav and other external triggers
+  useEffect(() => {
+    const handleDkCommand = (e: Event) => {
+      const command = (e as CustomEvent<{ command: string }>).detail.command;
+      if (command && !isThinking) {
+        handleCommand(command);
+      }
+    };
+    window.addEventListener('dk-command', handleDkCommand);
+    return () => window.removeEventListener('dk-command', handleDkCommand);
+  }, [handleCommand, isThinking]);
 
   const loadingText = "\n DK-01 SYSTEM INITIALIZATION\n> Loading core modules...\n> Calibrating sensors...\n> Establishing connection...\n> Boot sequence complete... \n> System ready...";
 
