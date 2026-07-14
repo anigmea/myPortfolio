@@ -22,6 +22,7 @@ import { PortfolioAnalytics } from "@/components/dataScience/PortfolioAnalytics"
 import { SkillsGrid } from "@/components/dataScience/SkillsGrid";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { TopNav } from "@/components/navigation/TopNav";
+import { MobileLayout } from "@/components/layout/MobileLayout";
 
 // Lazy load heavy components
 const MatrixRain = lazy(() => import("@/components/effects/matrixRain").then(m => ({ default: m.MatrixRain })));
@@ -969,6 +970,14 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check, { passive: true });
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   const konamiSequenceRef = useRef<string[]>([]);
 
   // Keyboard shortcuts
@@ -1256,6 +1265,10 @@ export default function Home() {
   );
 
   const loadingText = "\n DK-01 SYSTEM INITIALIZATION\n> Loading core modules...\n> Calibrating sensors...\n> Establishing connection...\n> Boot sequence complete... \n> System ready...";
+
+  if (isMobile && projects.length > 0) {
+    return <MobileLayout projects={projects} experience={experience} education={education} />;
+  }
 
   return (
     <div className={`min-h-screen w-screen font-mono relative ${lightMode ? 'bg-white text-gray-800' : 'bg-black text-green-400'}`}>
