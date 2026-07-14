@@ -48,10 +48,15 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
       [...projects, ...experience].flatMap(item => item.tech)
     ).size;
 
-    // Timeline analysis
-    const experienceYears = experience.map(e => parseInt(e.year) || 0);
-    const earliestYear = Math.min(...experienceYears, new Date().getFullYear());
-    const latestYear = Math.max(...experienceYears, new Date().getFullYear());
+    // Timeline analysis - extract first 4-digit year from strings like "Apr 2025 – Present"
+    const extractYear = (yearStr: string) => {
+      const match = yearStr.match(/\d{4}/);
+      return match ? parseInt(match[0]) : new Date().getFullYear();
+    };
+    const experienceYears = experience.map((e: Experience) => extractYear(e.year));
+    const currentYear = new Date().getFullYear();
+    const earliestYear = experienceYears.length > 0 ? Math.min(...experienceYears) : currentYear;
+    const latestYear = currentYear;
     const careerSpan = latestYear - earliestYear;
 
     return {

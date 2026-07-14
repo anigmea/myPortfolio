@@ -39,10 +39,7 @@ export function ContactForm() {
     <form
       onSubmit={handleSendMessage}
       className="w-full mt-4 space-y-3"
-      name="contact"
-      data-netlify="true"
     >
-      <input type="hidden" name="form-name" value="contact" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <input
           className="w-full p-2 bg-gray-900 border border-green-500 text-green-400 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md transition-all duration-300 ease-in-out"

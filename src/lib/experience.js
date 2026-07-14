@@ -6,18 +6,10 @@ export const experience = [
         year: "September 2025 - Present",
         title: "Project Mentor",
         company: "Eclipse Analytics",
-        description: "Guided a team of 4 students to analyse the concept of gravity in basketball, developing a machine learning model to predict offensive impact.",
+        description: "Guided a team of 4 students to analyze the concept of gravity in basketball, developing a machine learning model to predict offensive impact.",
         tech: ["Python", "Data Analysis"],
         color: "#FFDA64"
     },
-    // {
-    //     year: "September 2025 – Present",
-    //     title: "Assistant testing specialist",
-    //     company: "Triton testing Center, UCSD",
-    //     description: "Invigilated and assisted students in the testing center, ensuring their academic integrity and ethical behavior.",
-    //     tech: ["Academic Integrity", "Ethical Behavior", "Undergraduates", "Grad Students"],
-    //     color: "#CF00AA"
-    // },
     {
         year: "Apr 2025 – Present",
         title: "Research Assistant",
@@ -26,22 +18,6 @@ export const experience = [
         tech: ["Python", "Stata", "Econometrics", "Data Analysis"],
         color: "#00FFAA"
     },
-    // {
-    //     year: "September 2025 - present",
-    //     title: "Front of House Intern",
-    //     company: "Epstein Family Ampetheater, UCSD",
-    //     description: "Assisted in the front of house operations, ensuring a smooth and enjoyable experience for guests.",
-    //     tech: ["Customer Service", "Guest Experience", "Event Planning", "Front of House Operations"],
-    //     color: "#FFBA00"
-    // },
-    // {
-    //     year: "Apr 2025 – Jun 2025",
-    //     title: "Academic Integrity Peer Educator",
-    //     company: "Academic Integrity Office, UCSD",
-    //     description: "Facilitated Academic Integrity seminars for undergraduates and grad students, emphasizing the importance of ethical behavior in academia.",
-    //     tech: ["Academic Integrity", "Ethical Behavior", "Undergraduates", "Grad Students"],
-    //     color: "#B469FE"
-    // },
     {
         year: "Apr 2025 – August 2025",
         title: "Software Engineer Intern",

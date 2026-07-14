@@ -130,10 +130,6 @@ export function CommandInterface({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={() => setShowSuggestions(input.length > 0 && suggestions.length > 0)}
-            // onBlur={() => {
-            //   // Delay to allow click on suggestions
-            //   setTimeout(() => setShowSuggestions(false), 200);
-            // }}
             className={`w-full px-4 py-3 text-lg rounded-xl bg-transparent border-none focus:outline-none ${
               lightMode 
                 ? 'text-blue-900 placeholder-blue-400' 

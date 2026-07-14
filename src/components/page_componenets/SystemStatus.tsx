@@ -17,6 +17,8 @@ export const SystemStatusDashboard = memo(function SystemStatusDashboard({ light
     const [uptime, setUptime] = useState(0);
     const [githubData, setGithubData] = useState<GitHubData | null>(null);
     const [startTime] = useState(Date.now());
+    const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+    const [pageLoadMs, setPageLoadMs] = useState<number | null>(null);
   
     // Update time every second
     useEffect(() => {
@@ -27,6 +29,26 @@ export const SystemStatusDashboard = memo(function SystemStatusDashboard({ light
       return () => clearInterval(timer);
     }, [startTime]);
   
+    // Online/offline detection
+    useEffect(() => {
+      const onOnline = () => setIsOnline(true);
+      const onOffline = () => setIsOnline(false);
+      window.addEventListener('online', onOnline);
+      window.addEventListener('offline', onOffline);
+      return () => {
+        window.removeEventListener('online', onOnline);
+        window.removeEventListener('offline', onOffline);
+      };
+    }, []);
+
+    // Page load performance
+    useEffect(() => {
+      if (typeof performance !== 'undefined' && performance.timing) {
+        const load = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        if (load > 0) setPageLoadMs(load);
+      }
+    }, []);
+
     // Fetch GitHub data
     useEffect(() => {
       const fetchGitHubData = async () => {
@@ -121,20 +143,28 @@ export const SystemStatusDashboard = memo(function SystemStatusDashboard({ light
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className={`border rounded-lg p-3 ${lightMode ? 'border-green-300 bg-green-50' : 'border-green-500/50 bg-black/20'}`}>
-              <div className={`text-sm font-bold ${lightMode ? 'text-green-700' : 'text-green-300'}`}>CPU</div>
-              <div className={`text-lg font-mono ${lightMode ? 'text-green-600' : 'text-green-400'}`}>Optimal</div>
+              <div className={`text-sm font-bold ${lightMode ? 'text-green-700' : 'text-green-300'}`}>Load Time</div>
+              <div className={`text-lg font-mono ${lightMode ? 'text-green-600' : 'text-green-400'}`}>
+                {pageLoadMs !== null ? `${pageLoadMs}ms` : 'Fast'}
+              </div>
             </div>
             <div className={`border rounded-lg p-3 ${lightMode ? 'border-blue-300 bg-blue-50' : 'border-blue-500/50 bg-black/20'}`}>
-              <div className={`text-sm font-bold ${lightMode ? 'text-blue-700' : 'text-blue-300'}`}>Memory</div>
-              <div className={`text-lg font-mono ${lightMode ? 'text-blue-600' : 'text-blue-400'}`}>Stable</div>
+              <div className={`text-sm font-bold ${lightMode ? 'text-blue-700' : 'text-blue-300'}`}>GitHub</div>
+              <div className={`text-lg font-mono ${lightMode ? 'text-blue-600' : 'text-blue-400'}`}>
+                {githubData ? `${githubData.publicRepos} repos` : 'Loading...'}
+              </div>
             </div>
             <div className={`border rounded-lg p-3 ${lightMode ? 'border-yellow-300 bg-yellow-50' : 'border-yellow-500/50 bg-black/20'}`}>
               <div className={`text-sm font-bold ${lightMode ? 'text-yellow-700' : 'text-yellow-300'}`}>Network</div>
-              <div className={`text-lg font-mono ${lightMode ? 'text-yellow-600' : 'text-yellow-400'}`}>Connected</div>
+              <div className={`text-lg font-mono ${isOnline ? (lightMode ? 'text-yellow-600' : 'text-yellow-400') : 'text-red-500'}`}>
+                {isOnline ? 'Online' : 'Offline'}
+              </div>
             </div>
             <div className={`border rounded-lg p-3 ${lightMode ? 'border-purple-300 bg-purple-50' : 'border-purple-500/50 bg-black/20'}`}>
               <div className={`text-sm font-bold ${lightMode ? 'text-purple-700' : 'text-purple-300'}`}>AI Core</div>
-              <div className={`text-lg font-mono ${lightMode ? 'text-purple-600' : 'text-purple-400'}`}>Active</div>
+              <div className={`text-lg font-mono ${lightMode ? 'text-purple-600' : 'text-purple-400'}`}>
+                {githubData ? 'Active' : 'Booting...'}
+              </div>
             </div>
           </div>
         </div>

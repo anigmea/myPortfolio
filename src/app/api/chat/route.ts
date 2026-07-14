@@ -70,7 +70,7 @@ function ensureModelWithTools(apiKey: string) {
         for (const [key, value] of Object.entries(shape)) {
           const zodField = value as unknown as { _def: { typeName: string; description?: string } };
           properties[key] = {
-            type: zodField._def.typeName === 'ZodString' ? 'string' : 'string',
+            type: 'string',
             description: zodField._def.description,
           };
         }
@@ -231,7 +231,6 @@ const requestSchema = z.object({
 
 // --- 8. Create the POST Handler ---
 export async function POST(request: NextRequest) {
-  const startTime = Date.now();
   let rateLimit: ReturnType<typeof checkRateLimit> | null = null;
   
   try {
@@ -284,8 +283,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { history, prompt }: APIRequest = validationResult.data;
-
-    console.log("Prompt:", prompt);
 
     // --- Fast path for simple, known commands (avoid model latency/timeouts) ---
     const normalizedPrompt = prompt.trim().toLowerCase();
@@ -415,13 +412,7 @@ export async function POST(request: NextRequest) {
       timeoutPromise,
     ]) as { messages: BaseMessage[]; ui_update?: { type: string; payload?: unknown } };
 
-    console.log("finalState:", finalState);
-
     const lastMessage = finalState.messages[finalState.messages.length - 1];
-    const lastAIMessage = lastMessage instanceof AIMessage ? lastMessage : null;
-    console.log("lastMessage:", lastMessage);
-    console.log("lastMessage.content:", lastMessage.content);
-    console.log("lastMessage.tool_calls:", lastAIMessage?.tool_calls);
 
     let text_response = "";
     if (typeof lastMessage.content === "string") {
@@ -468,10 +459,6 @@ export async function POST(request: NextRequest) {
       };
     }
     
-    console.log("text_response:", text_response);
-    console.log("ui_update:", finalState.ui_update);
-    console.log(`Request processed in ${Date.now() - startTime}ms`);
-
     // Send back the new ai_message so the client can add it to history
     const response: APIResponse = {
       text_response: text_response,

@@ -15,8 +15,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DK-01 | AI Core Interface",
-  description: "Advanced AI system interface with interactive neural core",
+  title: "Divyansh Kanodia | DK-01 Portfolio",
+  description: "Portfolio of Divyansh Kanodia — Data Science & Business Economics at UC San Diego. Focused on reinforcement learning, LLM-enabled robotics, and labor market analytics.",
+  keywords: ["Divyansh Kanodia", "Data Science", "Reinforcement Learning", "UC San Diego", "Machine Learning", "Portfolio", "LLM", "Robotics"],
+  authors: [{ name: "Divyansh Kanodia" }],
+  openGraph: {
+    title: "Divyansh Kanodia | DK-01 Portfolio",
+    description: "Interactive AI-powered portfolio. Explore projects in RL, data science, and economic modeling.",
+    url: "https://dkanodia.netlify.app",
+    siteName: "DK-01 | Divyansh Kanodia",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Divyansh Kanodia | DK-01 Portfolio",
+    description: "Interactive AI-powered portfolio. Explore projects in RL, data science, and economic modeling.",
+    creator: "@anigmea",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

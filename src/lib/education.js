@@ -67,4 +67,3 @@ export const education = {
 export const getEducation = () => {
     return education;
 };
-

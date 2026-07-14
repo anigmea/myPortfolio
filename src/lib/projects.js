@@ -20,7 +20,7 @@ export const projects = [
     },
     {
         title: "Monte Carlo Optimization",
-        description: "Implmented a dashboard for the Value at Risk and Conditional Value at Risk Optimization for a Portfolio using a Monte Carlo Simulation.",
+        description: "Implemented a dashboard for the Value at Risk and Conditional Value at Risk Optimization for a Portfolio using a Monte Carlo Simulation.",
         tech: ["Python", "pandas", "streamlit", "matplotlib", "yfinance", "scipy"],
         link: "https://github.com/anigmea/monte_carlo",
         keywords: ["monte carlo", "optimization", "value at risk", "conditional value at risk", "portfolio"],
@@ -71,7 +71,7 @@ export const projects = [
     },
     {
         title: "Casino",
-        description: "Implemented a Casino game with python, consisting of varied games and connecting them with SQl to maintain the amount of money of the player.",
+        description: "Implemented a Casino game with python, consisting of varied games and connecting them with SQL to maintain the amount of money of the player.",
         tech: ["Python", "SQL"],
         link: "https://github.com/anigmea/casino",
         keywords: ["Casino", "python", "SQL"],
@@ -87,12 +87,12 @@ export const projects = [
         subject: "Research" 
     },
     {
-        title: "Reddit Post Engagement Prediction Reccomender System",
-        description: "Implemented a reccomender system to predict the engagement rates of the reddit post based on its features.",
+        title: "Reddit Post Engagement Prediction Recommender System",
+        description: "Implemented a recommender system to predict the engagement rates of the reddit post based on its features.",
         tech: ["Python"],
         // Hosted research presentation
         link: "/research/Reddit_Engagement_Prediction_Presentation.pptx",
-        keywords: ["reddit", "engagement rates", "reccomender system", "python"],
+        keywords: ["reddit", "engagement rates", "recommender system", "python"],
         subject: "Research"
     }
 ];
