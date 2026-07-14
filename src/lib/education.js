@@ -10,7 +10,6 @@ export const education = {
     location: "La Jolla, California",
     description: "Data Science and Business Economics student combining machine learning, econometrics, and optimization to analyze complex systems and strategic decision-making.",
 
-
     // Key course modules organized by category
     modules: {
         "Core Data Science": [
