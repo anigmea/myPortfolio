@@ -23,6 +23,7 @@ import { SkillsGrid } from "@/components/dataScience/SkillsGrid";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { TopNav } from "@/components/navigation/TopNav";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { ScrollWorld } from "@/components/scroll/ScrollWorld";
 
 // Lazy load heavy components
 const MatrixRain = lazy(() => import("@/components/effects/matrixRain").then(m => ({ default: m.MatrixRain })));
@@ -1273,6 +1274,9 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen w-screen font-mono relative ${lightMode ? 'bg-white text-gray-800' : 'bg-black text-green-400'}`}>
+        {/* Scroll World Hero — desktop only, activates when video assets are present */}
+        <ScrollWorld />
+
         {/* Toast Container */}
         <ToastContainer lightMode={lightMode} />
         
