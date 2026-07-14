@@ -56,4 +56,3 @@ export const experience = [
 export const getExperience = () => {
     return experience;
 };
-

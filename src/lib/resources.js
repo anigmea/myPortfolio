@@ -28,5 +28,3 @@ export const resources = [
 ];
 
 export const getResources = () => resources;
-
-
