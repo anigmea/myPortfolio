@@ -767,8 +767,8 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
             const QUANT_PROJECT_TITLES = [
               'Monte Carlo Optimization',
               'Fleet Attack',
-              'Rate My Recipe',
-              'Reddit Post Engagement Prediction Recommender System',
+              'Tic Tac Toe Bot',
+              'Frozen Lake Solver',
             ];
             const QUANT_EXP_COMPANIES = ['KPMG', 'QueryHat', 'Undergraduate Economics Lab'];
             const quantProjects = projects.filter((p: any) => QUANT_PROJECT_TITLES.includes(p.title));

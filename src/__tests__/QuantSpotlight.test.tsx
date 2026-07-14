@@ -1,8 +1,8 @@
 const QUANT_PROJECT_TITLES = [
   'Monte Carlo Optimization',
   'Fleet Attack',
-  'Rate My Recipe',
-  'Reddit Post Engagement Prediction Recommender System',
+  'Tic Tac Toe Bot',
+  'Frozen Lake Solver',
 ];
 
 const QUANT_EXPERIENCE_COMPANIES = ['KPMG', 'QueryHat', 'Undergraduate Economics Lab'];
