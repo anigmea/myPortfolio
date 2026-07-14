@@ -65,7 +65,7 @@ export const SystemStatusDashboard = memo(function SystemStatusDashboard({ light
             });
           }
         } catch {
-          console.log('GitHub API not available');
+          // GitHub API unavailable — silently ignore
         }
       };
       fetchGitHubData();
