@@ -762,6 +762,63 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
               </div>
               
                );
+          case 'quant_spotlight': {
+            const QUANT_PROJECT_TITLES = [
+              'Monte Carlo Optimization',
+              'Fleet Attack',
+              'Rate My Recipe',
+              'Reddit Post Engagement Prediction Recommender System',
+            ];
+            const QUANT_EXP_COMPANIES = ['KPMG', 'QueryHat', 'Undergraduate Economics Lab'];
+            const quantProjects = projects.filter((p: any) => QUANT_PROJECT_TITLES.includes(p.title));
+            const quantExp = experience.filter((e: any) => QUANT_EXP_COMPANIES.includes(e.company));
+            return (
+              <div className="space-y-6">
+                <div>
+                  <h2 className={`text-3xl font-bold mb-1 ${lightMode ? 'text-blue-600' : 'text-cyan-200'}`}>
+                    Quant &amp; Finance Highlights
+                  </h2>
+                  <p className={`text-sm mb-6 ${lightMode ? 'text-gray-500' : 'text-cyan-600'}`}>
+                    Reinforcement Learning · Quantitative Finance · Labor Economics
+                  </p>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold mb-3 ${lightMode ? 'text-blue-500' : 'text-cyan-400'}`}>Experience</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {quantExp.map((exp: any) => (
+                      <div key={exp.company} className={`rounded-lg p-4 border ${lightMode ? 'border-blue-200 bg-blue-50' : 'border-cyan-500/30 bg-black/40'}`}>
+                        <div className="text-xs font-bold mb-1" style={{ color: exp.color }}>{exp.year}</div>
+                        <div className={`font-bold ${lightMode ? 'text-blue-700' : 'text-cyan-200'}`}>{exp.title}</div>
+                        <div className={`text-sm ${lightMode ? 'text-blue-500' : 'text-cyan-400'}`}>{exp.company}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold mb-3 ${lightMode ? 'text-blue-500' : 'text-cyan-400'}`}>Selected Projects</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {quantProjects.map((p: any) => (
+                      <div key={p.title} className={`rounded-lg p-4 border ${lightMode ? 'border-blue-200 bg-blue-50' : 'border-cyan-500/30 bg-black/40'}`}>
+                        <h4 className={`font-bold mb-1 ${lightMode ? 'text-blue-700' : 'text-cyan-200'}`}>{p.title}</h4>
+                        <p className={`text-sm mb-3 ${lightMode ? 'text-gray-600' : 'text-cyan-500'}`}>{p.description}</p>
+                        {p.link && (
+                          <a href={p.link} target="_blank" rel="noopener noreferrer"
+                            className={`text-xs border rounded px-2 py-1 inline-flex items-center ${lightMode ? 'border-blue-300 text-blue-600 hover:bg-blue-100' : 'border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10'}`}>
+                            {p.link.startsWith('/research/') ? 'View paper' : 'View project'}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center pt-2">
+                  <p className={`text-sm ${lightMode ? 'text-gray-500' : 'text-cyan-600'}`}>
+                    Type <span className="font-mono">projects</span> to see all work, or <span className="font-mono">experience</span> for the full timeline.
+                  </p>
+                </div>
+              </div>
+            );
+          }
           case 'future':
               return (
                   <div>
@@ -983,10 +1040,10 @@ export default function Home() {
     }
     
     if (savedName) {
-      setLog([{ type: 'system', text: `Welcome back, ${savedName}.\nDK-01 Cognitive Interface active.\n\n> ${t('awaitingCommand')}` }]);
+      setLog([{ type: 'system', text: `Welcome back, ${savedName}.\nDK-01 Cognitive Interface active.\nReinforcement Learning · Quantitative Finance · Labor Economics\n\n> ${t('awaitingCommand')}` }]);
     } else {
       // Default welcome message if no name is saved
-      setLog([{ type: 'system', text: `${t('welcome')}\nDK-01 Cognitive Interface active.\n\n> ${t('awaitingCommand')}` }]);
+      setLog([{ type: 'system', text: `${t('welcome')}\nDK-01 Cognitive Interface active.\nReinforcement Learning · Quantitative Finance · Labor Economics\n\n> ${t('awaitingCommand')}` }]);
     }
   }, []); // Empty dependency array, runs once
 
@@ -1032,7 +1089,10 @@ export default function Home() {
   }, [booted]);
 
   const handleTypingComplete = useCallback(() => {
-    setIsTyping(false); 
+    setIsTyping(false);
+    setTimeout(() => {
+      setActiveContent({ type: 'quant_spotlight' });
+    }, 800);
   }, []); // No dependencies
 
   // --- REFACTORED handleCommand for LANGGRAPH ---
