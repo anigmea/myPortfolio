@@ -1466,6 +1466,43 @@ export default function Home() {
                       ))}
                     </div>
 
+                    {/* Resume & Social CTA */}
+                    <div className="w-full max-w-3xl px-4 mb-4 flex flex-wrap gap-3 justify-center">
+                      <button
+                        onClick={() => !isThinking && handleCommand('projects')}
+                        className={`px-4 py-2 rounded text-sm font-mono border transition-colors ${
+                          lightMode
+                            ? 'border-blue-300 text-blue-600 hover:bg-blue-100'
+                            : 'border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10'
+                        }`}
+                      >
+                        → View Projects
+                      </button>
+                      <a
+                        href="/resume.pdf"
+                        download
+                        className={`px-4 py-2 rounded text-sm font-mono border transition-colors ${
+                          lightMode
+                            ? 'border-blue-300 text-blue-600 hover:bg-blue-100'
+                            : 'border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10'
+                        }`}
+                      >
+                        ↓ Download Resume
+                      </a>
+                      <a
+                        href="https://www.linkedin.com/in/divyansh-kanodia/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`px-4 py-2 rounded text-sm font-mono border transition-colors ${
+                          lightMode
+                            ? 'border-blue-300 text-blue-600 hover:bg-blue-100'
+                            : 'border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10'
+                        }`}
+                      >
+                        ↗ LinkedIn
+                      </a>
+                    </div>
+
                     {/* Centered Command Input - FIXED positioning */}
                     <div className="w-full max-w-3xl px-4 z-30">
                         <AnimatePresence>
