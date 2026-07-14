@@ -770,7 +770,7 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
               'Tic Tac Toe Bot',
               'Frozen Lake Solver',
             ];
-            const QUANT_EXP_COMPANIES = ['KPMG', 'QueryHat', 'Undergraduate Economics Lab'];
+            const QUANT_EXP_COMPANIES = ['KPMG', 'Tan Labs', 'Undergraduate Economics Lab'];
             const quantProjects = projects.filter((p: any) => QUANT_PROJECT_TITLES.includes(p.title));
             const quantExp = experience.filter((e: any) => QUANT_EXP_COMPANIES.includes(e.company));
             return (

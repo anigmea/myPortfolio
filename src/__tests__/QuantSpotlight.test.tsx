@@ -5,7 +5,7 @@ const QUANT_PROJECT_TITLES = [
   'Frozen Lake Solver',
 ];
 
-const QUANT_EXPERIENCE_COMPANIES = ['KPMG', 'QueryHat', 'Undergraduate Economics Lab'];
+const QUANT_EXPERIENCE_COMPANIES = ['KPMG', 'Tan Labs', 'Undergraduate Economics Lab'];
 
 test('quant project titles include Monte Carlo Optimization', () => {
   expect(QUANT_PROJECT_TITLES).toContain('Monte Carlo Optimization');
