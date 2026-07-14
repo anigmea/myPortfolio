@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef, memo, useCallback, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, Linkedin, Mail, Search, Download, Copy } from 'lucide-react';
+import { Github, Linkedin, Mail } from 'lucide-react';
 import { getProjects } from '../lib/projects';
 import { getExperience } from '../lib/experience';
 import { getEducation } from '../lib/education';
@@ -17,7 +17,6 @@ import { TerminalLog } from "@/components/terminal/TerminalLog";
 import { CommandInterface } from "@/components/terminal/CommandInterface";
 import { ToastContainer } from "@/components/ui/Toast";
 import { SearchModal } from "@/components/ui/SearchModal";
-import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { PortfolioAnalytics } from "@/components/dataScience/PortfolioAnalytics";
 import { SkillsGrid } from "@/components/dataScience/SkillsGrid";
 import { useTranslation } from "@/lib/i18n/useTranslation";
