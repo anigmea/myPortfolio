@@ -21,6 +21,7 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { PortfolioAnalytics } from "@/components/dataScience/PortfolioAnalytics";
 import { SkillsGrid } from "@/components/dataScience/SkillsGrid";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { TopNav } from "@/components/navigation/TopNav";
 
 // Lazy load heavy components
 const MatrixRain = lazy(() => import("@/components/effects/matrixRain").then(m => ({ default: m.MatrixRain })));
@@ -363,30 +364,62 @@ const TimelineBike = memo(function TimelineBike({ experience }: TimelineBikeProp
 
 // --- Content Display Component (UPDATED to accept props) ---
 const ContentDisplay = memo(function ContentDisplay({ content, projects, experience, education, lightMode }: any) {
+    const [projectSubjectFilter, setProjectSubjectFilter] = useState<string | null>(null);
     if (!content) return null;
     const renderContent = () => {
       switch(content.type) {
-        case 'projects':
-          const projectsBySubject = projects.reduce((acc: any, project: any) => {
+        case 'projects': {
+          const allSubjects: string[] = Array.from(new Set(projects.map((p: any) => p.subject)));
+          const filteredProjects = projectSubjectFilter
+            ? projects.filter((p: any) => p.subject === projectSubjectFilter)
+            : projects;
+          const projectsBySubject = filteredProjects.reduce((acc: any, project: any) => {
             const subject = project.subject;
             if (!acc[subject]) acc[subject] = [];
             acc[subject].push(project);
             return acc;
-        }, {});
-        
+          }, {});
+
           return (
               <div>
                   <h2 className={`text-3xl font-bold mb-6 ${lightMode ? 'text-blue-600' : 'text-green-200'}`}>
                       Projects
                   </h2>
-      
+
+                  {/* Subject filter chips */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    <button
+                      onClick={() => setProjectSubjectFilter(null)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                        projectSubjectFilter === null
+                          ? lightMode ? 'bg-blue-600 text-white border-blue-600' : 'bg-green-500 text-black border-green-500'
+                          : lightMode ? 'border-blue-300 text-blue-700 hover:bg-blue-100' : 'border-green-500/50 text-green-400 hover:bg-green-500/10'
+                      }`}
+                    >
+                      All ({projects.length})
+                    </button>
+                    {allSubjects.map((subject: string) => (
+                      <button
+                        key={subject}
+                        onClick={() => setProjectSubjectFilter(subject)}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                          projectSubjectFilter === subject
+                            ? lightMode ? 'bg-blue-600 text-white border-blue-600' : 'bg-green-500 text-black border-green-500'
+                            : lightMode ? 'border-blue-300 text-blue-700 hover:bg-blue-100' : 'border-green-500/50 text-green-400 hover:bg-green-500/10'
+                        }`}
+                      >
+                        {subject} ({projects.filter((p: any) => p.subject === subject).length})
+                      </button>
+                    ))}
+                  </div>
+
                   {Object.entries(projectsBySubject).map(([subject, subjectProjects]: any) => (
                       <div key={subject} className="mb-8">
                           {/* Subject Heading */}
                           <h3 className="text-2xl font-semibold mb-4 text-green-400">
                               {subject}
                           </h3>
-      
+
                           {/* Projects Grid */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {subjectProjects.map((p: any) => {
@@ -429,7 +462,8 @@ const ContentDisplay = memo(function ContentDisplay({ content, projects, experie
                   ))}
               </div>
           );
-      
+        }
+
           case 'education':
               return (
                   <div className="space-y-8">
@@ -878,9 +912,18 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
 
+  const konamiSequenceRef = useRef<string[]>([]);
+
   // Keyboard shortcuts
   useEffect(() => {
+    const KONAMI_CODE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Konami code detection — ↑↑↓↓←→←→BA triggers matrix
+      konamiSequenceRef.current = [...konamiSequenceRef.current, e.key].slice(-10);
+      if (konamiSequenceRef.current.join(',') === KONAMI_CODE.join(',')) {
+        konamiSequenceRef.current = [];
+        setMatrixActive(true);
+      }
       // Ctrl/Cmd + K for search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -913,6 +956,18 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // dk-command event: fired by TopNav and other external triggers
+  useEffect(() => {
+    const handleDkCommand = (e: Event) => {
+      const command = (e as CustomEvent<{ command: string }>).detail.command;
+      if (command && !isThinking) {
+        handleCommand(command);
+      }
+    };
+    window.addEventListener('dk-command', handleDkCommand);
+    return () => window.removeEventListener('dk-command', handleDkCommand);
+  }, [handleCommand, isThinking]);
 
   useEffect(() => {
     setProjects(getProjects());
@@ -1007,7 +1062,6 @@ export default function Home() {
         cache: 'no-store'
       });
 
-      console.log(response);
       if (!response.ok) {
         const errorText = await response.text();
         let errorMessage = 'Error: Failed to connect to cognitive core.';
@@ -1214,44 +1268,18 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Top Action Buttons – keep this minimal */}
-        <div className="fixed top-4 right-4 z-50 flex gap-2 items-center">
-          {/* Language Switcher */}
-          <LanguageSwitcher lightMode={lightMode} />
-          
-          {/* Search Button */}
-          <button
-            onClick={() => setShowSearch(true)}
-            className={`p-2 rounded-lg transition-all duration-300 hover:opacity-70 ${
-              lightMode
-                ? 'bg-blue-100 hover:bg-blue-200 text-blue-700'
-                : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'
-            }`}
-            aria-label={`${t('search')} (Ctrl+K)`}
-            title={`${t('search')} (Ctrl+K)`}
-          >
-            <Search size={20} />
-          </button>
-          
-          {/* Theme Toggle Button */}
-          <button
-            onClick={() => {
-              const newLightMode = !lightMode;
-              setLightMode(newLightMode);
-              localStorage.setItem('theme', newLightMode ? 'light' : 'dark');
-              showToast(t('themeChanged'), 'info');
-            }}
-            className={`p-2 rounded-lg transition-all duration-300 hover:opacity-70 ${
-              lightMode
-                ? 'bg-blue-100 hover:bg-blue-200 text-blue-700'
-                : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'
-            }`}
-            aria-label={t('toggleTheme')}
-            title={t('toggleTheme')}
-          >
-            {lightMode ? '☀️' : '🌙'}
-          </button>
-        </div>
+        {/* Top Nav Bar */}
+        <TopNav
+          activeSection={activeContent?.type ?? null}
+          lightMode={lightMode}
+          onSearch={() => setShowSearch(true)}
+          onThemeToggle={() => {
+            const newLightMode = !lightMode;
+            setLightMode(newLightMode);
+            localStorage.setItem('theme', newLightMode ? 'light' : 'dark');
+            showToast(t('themeChanged'), 'info');
+          }}
+        />
         
         
         <style>{`.blinking-cursor { animation: blink 1s step-end infinite; } @keyframes blink { 50% { opacity: 0; } }`}</style>
@@ -1284,7 +1312,7 @@ export default function Home() {
                     key="main"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="flex flex-col items-center justify-start min-h-screen relative z-10 p-4 md:p-12 lg:p-20"
+                    className="flex flex-col items-center justify-start min-h-screen relative z-10 p-4 pt-14 md:p-12 md:pt-14 lg:p-20 lg:pt-14"
                     style={{ position: 'relative' }}
                 >
                     {/* Neural Blob - Centered at top */}
@@ -1359,6 +1387,24 @@ export default function Home() {
                         />
                     </div>
                     {/* === END OF NEW BLOCK === */}
+
+                    {/* Quick suggestion chips */}
+                    <div className="w-full max-w-3xl px-4 mb-2 flex flex-wrap gap-2 justify-center">
+                      {(['projects', 'experience', 'intelligence', 'education', 'contact'] as const).map(chip => (
+                        <button
+                          key={chip}
+                          onClick={() => !isThinking && handleCommand(chip)}
+                          disabled={isThinking}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-200 capitalize ${
+                            lightMode
+                              ? 'border-blue-300 text-blue-600 hover:bg-blue-100 disabled:opacity-40'
+                              : 'border-green-500/50 text-green-400 hover:bg-green-500/10 disabled:opacity-40'
+                          }`}
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
 
                     {/* Centered Command Input - FIXED positioning */}
                     <div className="w-full max-w-3xl px-4 z-30">
