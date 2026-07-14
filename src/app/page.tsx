@@ -1141,9 +1141,6 @@ export default function Home() {
       }
 
       const { text_response, ui_update, ai_message } = await response.json();
-      console.log("text_response:", text_response);
-      console.log("ui_update:", ui_update);
-      console.log("ai_message:", ai_message);
 
       // 1. Always add the AI's text response to the log (even if empty, we'll show a default)
       // If text_response exists and is not empty, use it. Otherwise, provide a contextual message.
